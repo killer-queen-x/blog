@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mini.ma.GoodMapper">
+    <select id="GetGoods" resultType="com.example.mini.xx.Good">
+        select * from good where pid =#{pid}
+    </select>
+
+    <insert id="AddGood" parameterType="com.example.mini.xx.Good">
+        insert into good(pid,uid) values (#{pid},#{uid})
+    </insert>
+    <delete id="DelGood">
+        delete from good where pid=#{pid} and uid=#{uid}
+    </delete>
+    <delete id="RemoveGoods">
+        delete from good where pid=#{pid}
+    </delete>
+    <resultMap id="Live" type="com.example.mini.xx.Good">
+        <id column="gid" property="gid"/>
+        <result column="pid" property="pid"/>
+        <result column="uid" property="uid"/>
+        <collection property="posts" ofType="com.example.mini.xx.Post">
+            <id column="pid" property="pid"/>
+            <result column="title" property="title"/>
+            <result column="content" property="content"/>
+            <result column="image" property="image"/>
+            <result column="time" property="time"/>
+            <result column="uid" property="uid"/>
+        </collection>
+
+    </resultMap>
+    <select id="Live" resultMap="Live">
+        SELECT g.gid,p.* FROM good g LEFT JOIN post p on p.pid=g.pid  where g.uid=#{uid} order by g.gid desc
+    </select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mini.ma.CommentMapper">
+    <resultMap id="Comment" type="com.example.mini.xx.Comment">
+        <id column="cid" property="cid"/>
+        <result column="pid" property="pid"/>
+        <result column="uid" property="uid"/>
+        <result column="comment" property="comment"/>
+        <result column="ctime" property="ctime"/>
+        <result column="pictrue" property="pictrue"/>
+        <collection property="cusers" ofType="com.example.mini.xx.User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="icon" property="icon"/>
+            <result column="sign" property="sign"/>
+        </collection>
+    </resultMap>
+    <select id="CommentList" resultMap="Comment">
+        select c.*,u.nickname,u.icon
+         from comment c
+         left join
+         user u
+         on u.uid=c.uid
+         where pid=#{pid}
+    </select>
+    <insert id="AddComment" parameterType="com.example.mini.xx.Comment">
+        insert into comment(pid,puid,uid,comment,ctime,pictrue) values (#{pid},#{puid},#{uid},#{comment},#{ctime},#{pictrue})
+    </insert>
+    <resultMap id="MyComment" type="com.example.mini.xx.Comment">
+        <id column="cid" property="cid"/>
+        <result column="pid" property="pid"/>
+        <result column="puid" property="puid"/>
+        <result column="uid" property="uid"/>
+        <result column="comment" property="comment"/>
+        <result column="ctime" property="ctime"/>
+        <result column="pictrue" property="pictrue"/>
+        <collection property="posts" ofType="com.example.mini.xx.Post">
+            <id column="pid" property="pid"/>
+            <result column="title" property="title"/>
+            <result column="content" property="content"/>
+            <result column="image" property="image"/>
+            <result column="time" property="time"/>
+            <result column="uid" property="uid"/>
+        </collection>
+
+    </resultMap>
+    <select id="MyComment" resultMap="MyComment">
+        select c.cid,c.pid,c.comment,c.pictrue,c.ctime,p.title
+        from comment c
+        LEFT JOIN post p
+        on p.pid=c.pid
+        where c.uid=#{uid} order by cid desc
+    </select>
+    <delete id="RemoveComment">
+        delete from comment where pid=#{pid}
+    </delete>
+    <resultMap id="ComNotice" type="com.example.mini.xx.Comment">
+        <id column="cid" property="cid"/>
+        <result column="pid" property="pid"/>
+        <result column="puid" property="puid"/>
+        <result column="uid" property="uid"/>
+        <result column="comment" property="comment"/>
+        <result column="ctime" property="ctime"/>
+        <result column="pictrue" property="pictrue"/>
+        <collection property="cusers" ofType="com.example.mini.xx.User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="icon" property="icon"/>
+        </collection>
+        <collection property="posts" ofType="com.example.mini.xx.Post">
+            <id column="pid" property="pid"/>
+            <result column="title" property="title"/>
+            <result column="image" property="image"/>
+            <result column="uid" property="uid"/>
+        </collection>
+    </resultMap>
+    <select id="ComNotice" resultMap="ComNotice">
+    select c.*,u.nickname,u.icon,p.image,p.title
+    from comment c
+    LEFT JOIN user u
+    on u.uid=c.uid
+    LEFT JOIN post p
+    on p.pid=c.pid
+    where c.uid!=puid and puid=#{uid} order by cid desc
+    </select>
+</mapper>

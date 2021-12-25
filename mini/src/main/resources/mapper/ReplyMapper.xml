@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mini.ma.ReplyMapper">
+    <resultMap id="Reply" type="com.example.mini.xx.Reply">
+        <id column="rid" property="rid"/>
+        <result column="pid" property="pid"/>
+        <result column="cid" property="cid"/>
+        <result column="cuid" property="cuid"/>
+        <result column="uid" property="uid"/>
+        <result column="reply" property="reply"/>
+        <result column="rtime" property="rtime"/>
+        <collection property="rusers" ofType="com.example.mini.xx.User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="icon" property="icon"/>
+            <result column="sign" property="sign"/>
+        </collection>
+    </resultMap>
+    <select id="getReply" resultMap="Reply">
+        select r.*,u.nickname,u.icon
+         from reply r
+         left join user u
+         on u.uid=r.uid
+         where pid=#{pid}
+    </select>
+    <insert id="AddReply" parameterType="com.example.mini.xx.Comment">
+        insert into reply(pid,cid,cuid,uid,reply,rtime) values (#{pid},#{cid},#{cuid},#{uid},#{reply},#{rtime})
+    </insert>
+    <delete id="RemoveReply">
+        delete from reply where pid=#{pid}
+    </delete>
+
+    <resultMap id="ReplyNotice" type="com.example.mini.xx.Reply">
+        <id column="rid" property="rid"/>
+        <result column="pid" property="pid"/>
+        <result column="cid" property="cid"/>
+        <result column="cuid" property="cuid"/>
+        <result column="uid" property="uid"/>
+        <result column="reply" property="reply"/>
+        <result column="rtime" property="rtime"/>
+        <collection property="posts" ofType="com.example.mini.xx.Post">
+            <id column="pid" property="pid"/>
+            <result column="title" property="title"/>
+            <result column="image" property="image"/>
+        </collection>
+        <collection property="rusers" ofType="com.example.mini.xx.User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="icon" property="icon"/>
+        </collection>
+    </resultMap>
+    <select id="ReplyNotice" resultMap="ReplyNotice">
+        select r.*,u.nickname,u.icon,p.image,p.title
+        FROM reply r
+        LEFT JOIN user u
+        on u.uid=r.uid
+        LEFT JOIN post p
+        on p.pid=r.pid
+        where r.uid!=r.cuid and r.cuid=#{uid}
+        order by r.rid desc
+    </select>
+
+    <resultMap id="getMyReply" type="com.example.mini.xx.Reply">
+        <id column="rid" property="rid"/>
+        <result column="pid" property="pid"/>
+        <result column="cid" property="cid"/>
+        <result column="cuid" property="cuid"/>
+        <result column="uid" property="uid"/>
+        <result column="reply" property="reply"/>
+        <result column="rtime" property="rtime"/>
+        <collection property="posts" ofType="com.example.mini.xx.Post">
+            <id column="pid" property="pid"/>
+            <result column="title" property="title"/>
+            <result column="image" property="image"/>
+        </collection>
+        <collection property="rusers" ofType="com.example.mini.xx.User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="icon" property="icon"/>
+        </collection>
+        <collection property="comments" ofType="com.example.mini.xx.Comment">
+            <id column="cid" property="cid"/>
+            <result column="comment" property="comment"/>
+        </collection>
+    </resultMap>
+    <select id="getMyReply" resultMap="getMyReply">
+        SELECT r.*,p.title,p.image,u.nickname,u.icon ,c.comment
+        FROM reply r
+        LEFT JOIN post p
+        on p.pid=r.pid
+        LEFT JOIN comment c
+        on c.cid=r.cid
+        LEFT JOIN user u
+        on u.uid=c.uid
+        WHERE r.uid=#{uid}
+        order by r.rid desc
+    </select>
+</mapper>

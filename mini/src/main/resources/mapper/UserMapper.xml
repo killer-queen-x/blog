@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mini.ma.UserMapper">
+    <select id="Login" resultType="com.example.mini.xx.User">
+    select uid,icon,nickname from user where username=#{username} and password=#{password}
+    </select>
+
+    <select id="GetUser" resultType="com.example.mini.xx.User">
+    select uid,nickname,icon,sign from user where uid=#{uid}
+    </select>
+    <select id="Check" resultType="com.example.mini.xx.User">
+        select username from user where username=#{username}
+    </select>
+    <insert id="Register"  parameterType="com.example.mini.xx.User">
+            insert into user(username,password,nickname,icon,sign) values(#{username},#{password},#{nickname},#{icon},#{sign})
+    </insert>
+    <select id="GetEdit" resultType="com.example.mini.xx.User">
+        select uid,nickname,password,icon,sign from user where uid=#{uid}
+    </select>
+    <update id="Update" parameterType="com.example.mini.xx.User">
+    UPDATE user set icon=#{icon},nickname=#{nickname},password=#{password},sign=#{sign} WHERE uid =#{uid}
+    </update>
+</mapper>

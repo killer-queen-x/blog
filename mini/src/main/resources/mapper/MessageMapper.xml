@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mini.ma.MessageMapper">
+
+        <resultMap id="Chat" type="com.example.mini.xx.Message">
+            <id column="mid" property="mid"/>
+            <result column="sendid" property="sendid"/>
+            <result column="receiveid" property="receiveid"/>
+            <result column="message" property="message"/>
+            <result column="sendtime" property="sendtime"/>
+            <result column="photo" property="photo"/>
+            <collection property="users" ofType="com.example.mini.xx.User">
+                <id column="uid" property="uid"/>
+<result column="nickname" property="nickname"/>
+                <result column="icon" property="icon"/>
+            </collection>
+
+        </resultMap>
+
+<!--    信息列表-->
+    <select id="Message" resultMap="Chat">
+        select m.*,u.*
+        from message m left join user u on (m.receiveid=u.uid and m.sendid=#{uid}) or (m.receiveid=#{uid} and m.sendid=u.uid)
+        where sendtime in(
+        select max(sendtime) from message where sendid=#{uid} or receiveid=#{uid}
+        group by
+            concat(
+            if(sendid>receiveid,sendid,receiveid)))
+        and (sendid=#{uid} or receiveid=#{uid})
+        order by mid desc
+    </select>
+        <!--    -->
+        <select id="Chat" resultType="com.example.mini.xx.Message">
+        SELECT * FROM message WHERE sendid=#{uid} and receiveid=#{otherID} or sendid=#{otherID} and receiveid=#{uid}
+        </select>
+    <insert id="AddMessage" parameterType="com.example.mini.xx.Message">
+        insert into message(sendid,receiveid,message,sendtime,photo) values (#{sendid},#{receiveid},#{message},#{sendtime},#{photo})
+    </insert>
+</mapper>
